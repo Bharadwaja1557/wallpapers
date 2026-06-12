@@ -1,8 +1,8 @@
-## Wallpapers for Mac
+## Wallpapers for Desktop
 
 > Screen Dimensions: <br>
-> Width: 2560px <br>
-> Height: 1664px
+> Width: 1920px <br>
+> Height: 1080px
 
 ---
 

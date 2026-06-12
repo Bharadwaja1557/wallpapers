@@ -1,8 +1,8 @@
-## Wallpapers for Mac
+## Wallpapers for Desktop (4K UHD)
 
 > Screen Dimensions: <br>
-> Width: 2560px <br>
-> Height: 1664px
+> Width: 3840px <br>
+> Height: 2160px
 
 ---
 
