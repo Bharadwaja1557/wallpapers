@@ -57,13 +57,35 @@
     max-width: 54ch;
   }
 
-  .count {
-    color: var(--cyan);
-    font-size: .78rem;
-    letter-spacing: .18em;
+  /* ---- meta bar: dimensions live here, once ---- */
+
+  .metabar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: .5rem 2rem;
+    padding-bottom: 1.1rem;
+    margin-bottom: clamp(2rem, 4vw, 3rem);
+    border-bottom: 1px solid var(--line);
+    font-size: .75rem;
+    letter-spacing: .14em;
     text-transform: uppercase;
-    margin: 0 0 1.25rem;
   }
+
+  .count { color: var(--cyan); margin: 0; }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4rem 1.5rem;
+    margin: 0 0 0 auto;
+    padding: 0;
+    list-style: none;
+    color: var(--dim);
+  }
+
+  .legend .label { color: var(--fg); margin-right: .55rem; }
+  .legend .dims { font-variant-numeric: tabular-nums; }
 
   /* ---- grid ---- */
 
@@ -129,32 +151,29 @@
 
   .downloads {
     display: flex;
-    flex-direction: column;
-    border-top: 1px solid var(--line);
+    flex-wrap: wrap;
+    gap: .5rem;
   }
 
   .downloads a {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: .6rem .1rem;
-    border-bottom: 1px solid var(--line);
+    flex: 1 1 auto;
+    text-align: center;
+    padding: .5rem .7rem;
+    border: 1px solid var(--line);
     color: var(--fg);
     text-decoration: none;
-    font-size: .78rem;
-    letter-spacing: .06em;
-    transition: color .15s ease, padding-left .15s ease;
+    font-size: .72rem;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition: color .15s ease, border-color .15s ease, background-color .15s ease;
   }
 
   .downloads a:hover, .downloads a:focus-visible {
     color: var(--cyan);
-    padding-left: .5rem;
+    border-color: var(--cyan);
+    background: rgba(0, 229, 255, .07);
   }
-
-  .downloads .label { text-transform: uppercase; }
-  .downloads .dims { color: var(--dim); font-variant-numeric: tabular-nums; }
-  .downloads a:hover .dims, .downloads a:focus-visible .dims { color: var(--cyan); }
 
   /* ---- footer ---- */
 
@@ -188,7 +207,11 @@
     </p>
   </header>
 
-  <p class="count" id="count"></p>
+  <div class="metabar">
+    <p class="count" id="count"></p>
+    <ul class="legend" id="legend"></ul>
+  </div>
+
   <main class="grid" id="grid"></main>
 
   <footer>
@@ -209,8 +232,9 @@
     { num: "002", title: "Doomsday",       file: "002_Doomsday.png" },
   ];
 
-  // Folder -> label and dimensions. Preview always comes from desktop_1080
-  // so the page never loads the 4K files just to draw a thumbnail.
+  // Folder -> label and dimensions. Dimensions are printed once in the
+  // legend; the per-card links carry the label only. Preview always comes
+  // from desktop_1080 so the page never loads the 4K files for a thumbnail.
   const VARIANTS = [
     { dir: "desktop_1080", label: "Desktop",     dims: "1920 × 1080" },
     { dir: "desktop_2160", label: "Desktop 4K",  dims: "3840 × 2160" },
@@ -218,6 +242,14 @@
   ];
 
   const PREVIEW_DIR = "desktop_1080";
+
+  // Legend — the one place dimensions appear.
+  const legend = document.getElementById("legend");
+  for (const v of VARIANTS) {
+    const li = document.createElement("li");
+    li.innerHTML = `<span class="label">${v.label}</span><span class="dims">${v.dims}</span>`;
+    legend.appendChild(li);
+  }
 
   const grid = document.getElementById("grid");
 
@@ -249,7 +281,10 @@
       const a = document.createElement("a");
       a.href = `${v.dir}/${w.file}`;
       a.setAttribute("download", `${w.num}_${w.title.replace(/\s+/g, "_")}_${v.dir}.png`);
-      a.innerHTML = `<span class="label">&darr; ${v.label}</span><span class="dims">${v.dims}</span>`;
+      // Visible text is the label alone; the full description stays available
+      // to screen readers, which read links out of their visual context.
+      a.setAttribute("aria-label", `Download ${w.title} for ${v.label}, ${v.dims}`);
+      a.textContent = `↓ ${v.label}`;
       downloads.appendChild(a);
     }
 
